@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">StoryTellers</string>
+    <string name="welcome">Welcome fellow Storyteller!</string>
+    <string name="hintUsername">Username</string>
+    <string name="login">Login</string>
+    <string name="title_activity_room">Rooms</string>
+    <string name="hintRoomname">Roomname</string>
+    <string name="create">Create</string>
+
+</resources>
