@@ -30,7 +30,7 @@
 
         <Button
             android:id="@+id/leaveBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:background="#FFFFFF"
@@ -56,7 +56,7 @@
             android:id="@+id/editStory"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.50"
+            android:layout_weight="1"
             android:background="#FFFFFF"
             android:hint="@string/hintStory"
             android:inputType="text"
@@ -69,7 +69,7 @@
 
         <Button
             android:id="@+id/sendBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:background="#FFFFFF"
