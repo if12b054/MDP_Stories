@@ -19,8 +19,10 @@ public class MainActivity extends Activity {
 		if (username.getText().length() <= 0) {
 			username.setError("Please enter a username!");
 		} else {
-			Intent intent = new Intent(MainActivity.this, RoomActivity.class);
-			intent.putExtra("username", username.getText().toString());
+			Intent intent = new Intent(MainActivity.this,
+					RoomListActivity.class);
+			intent.putExtra("username",
+					username.getText().toString());
 			MainActivity.this.startActivity(intent);
 		}
 	}

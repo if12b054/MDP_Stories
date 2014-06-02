@@ -1,49 +1,49 @@
 package com.example.storytellers;
 
-import java.util.ArrayList;
-
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.TextView;
 
-
-public class RoomActivity extends ListActivity {
+public class RoomActivity extends Activity {
 
 	private String username;
-	private ArrayList<String> rooms;
-	private ArrayAdapter<String> adapter;
-	
+	private String roomname;
+	private TextView story;
+	private TextView room;
+
 	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_room);
 
+		this.story = (TextView) findViewById(R.id.textStory);
+		this.story.setMovementMethod(new ScrollingMovementMethod());
+
 		Intent intent = getIntent();
 		this.username = intent.getStringExtra("username");
-		createListView();
+		this.roomname = intent.getStringExtra("roomname");
+		this.room = (TextView) findViewById(R.id.textRoomname);
+		this.room.setText(this.roomname);
 	}
-	
-	private void createListView() {
-		this.rooms = new ArrayList<String>();
 
-		for (int i = 0; i < 10; i++) {
-			this.rooms.add("Room" + i);
-		}
-	    this.adapter = new ArrayAdapter<String>(this,
-	            android.R.layout.simple_list_item_1,
-	            rooms);
-	        setListAdapter(adapter);
-	}
-	
-	public final void createRoom(final View view) {
-		EditText roomname = (EditText) findViewById(R.id.editRoomname);
-		if (roomname.getText().length() <= 0) {
-			roomname.setError("Please enter a roomname!");
+	public final void sendSentence(final View view) {
+		EditText sentence = (EditText) findViewById(R.id.editStory);
+		if (sentence.getText().length() <= 0) {
+			sentence.setError("Please enter a sentence!");
 		} else {
-			System.out.println("Create new Room!");
+			story.append(sentence.getText().toString());
+			sentence.setText("");
 		}
+	}
+
+	public final void leaveRoom(final View view) {
+		Intent intent = new Intent(RoomActivity.this,
+				RoomListActivity.class);
+		intent.putExtra("username", this.username);
+		RoomActivity.this.startActivity(intent);
 	}
 }

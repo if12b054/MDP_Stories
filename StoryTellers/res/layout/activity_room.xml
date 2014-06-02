@@ -3,24 +3,62 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="${packageName}.${activityClass}"
-    android:background="#2271F0" >
+    android:background="#FFFFFF" >
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#2271F0"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+
+        <TextView
+            android:id="@+id/textRoomname"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:textColor="#FFFFFF"
+            android:paddingBottom="8dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="8dp"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/leaveBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:background="#FFFFFF"
+            android:onClick="leaveRoom"
+            android:paddingBottom="8dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="10dp"
+            android:text="@string/leave" />
+    </LinearLayout>
     
     <LinearLayout
+        android:id="@+id/bottom"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#2271F0"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp" >
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
 
         <EditText
-            android:id="@+id/editRoomname"
+            android:id="@+id/editStory"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.50"
             android:background="#FFFFFF"
-            android:hint="@string/hintRoomname"
+            android:hint="@string/hintStory"
             android:inputType="text"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="5dp"
@@ -30,28 +68,31 @@
             android:paddingTop="8dp" />
 
         <Button
-            android:id="@+id/createBtn"
+            android:id="@+id/sendBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:background="#FFFFFF"
-            android:onClick="createRoom"
+            android:onClick="sendSentence"
             android:paddingBottom="8dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:paddingTop="10dp"
-            android:text="@string/create" />
-
+            android:text="@string/send" />
     </LinearLayout>
     
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="75dp"
-        android:drawSelectorOnTop="false"
-        android:background="#FFFFFF" >    
-    </ListView>
-   
+	   
+	<TextView
+		android:id="@+id/textStory"
+	    android:layout_width="fill_parent"
+	   	android:layout_height="wrap_content"
+	    android:layout_above="@id/bottom"
+	    android:layout_below="@id/top"
+	    android:paddingBottom="5dp"
+	    android:paddingLeft="5dp"
+	    android:paddingRight="5dp"
+	    android:paddingTop="5dp"
+	    android:gravity="left"
+	    android:scrollbars="vertical" />    
+       
 </RelativeLayout>

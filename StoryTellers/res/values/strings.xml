@@ -8,5 +8,9 @@
     <string name="title_activity_room">Rooms</string>
     <string name="hintRoomname">Roomname</string>
     <string name="create">Create</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="leave">Leave</string>
+    <string name="send">Send</string>
+    <string name="hintStory">Enter your sentence</string>
 
 </resources>

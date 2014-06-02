@@ -23,8 +23,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.storytellers.RoomActivity"
+            android:name="com.example.storytellers.RoomListActivity"
             android:label="@string/title_activity_room" >
+        </activity>
+        <activity
+            android:name="com.example.storytellers.RoomActivity"
+            android:label="@string/title_activity_room" 
+            android:windowSoftInputMode="adjustPan|adjustResize" >
         </activity>
     </application>
 
