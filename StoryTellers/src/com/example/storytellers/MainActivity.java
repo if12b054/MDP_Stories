@@ -26,4 +26,9 @@ public class MainActivity extends Activity {
 			MainActivity.this.startActivity(intent);
 		}
 	}
+	
+	@Override
+	public void onBackPressed() {
+
+	}
 }

@@ -50,4 +50,12 @@ public class RoomListActivity extends ListActivity {
 			RoomListActivity.this.startActivity(intent);
 		}
 	}
+	
+	@Override
+	public void onBackPressed() {
+	    Intent intent = new Intent(RoomListActivity.this,
+				MainActivity.class);
+		RoomListActivity.this.startActivity(intent);
+	    finish();
+	}
 }

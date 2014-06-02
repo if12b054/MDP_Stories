@@ -51,4 +51,13 @@ public class RoomActivity extends Activity {
 		intent.putExtra("username", this.username);
 		RoomActivity.this.startActivity(intent);
 	}
+	
+	@Override
+	public void onBackPressed() {
+	    Intent intent = new Intent(RoomActivity.this,
+				RoomListActivity.class);
+		intent.putExtra("username", this.username);
+		RoomActivity.this.startActivity(intent);
+	    finish();
+	}
 }
