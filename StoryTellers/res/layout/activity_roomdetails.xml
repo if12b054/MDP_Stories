@@ -6,7 +6,7 @@
     android:background="#FFFFFF" >
     
     <LinearLayout
-       android:id="@+id/top"
+        android:id="@+id/top"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -15,34 +15,33 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp" >
 
-        <EditText
-            android:id="@+id/editRoomname"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/textRoomnameDetails"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:hint="@string/hintRoomname"
-            android:inputType="text"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="5dp"
+            android:textColor="#FFFFFF"
             android:paddingBottom="8dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:paddingTop="8dp" />
+            android:paddingTop="8dp"
+            android:textSize="18sp"
+            android:onClick="leaveDetails"
+			android:clickable="true" />
 
         <Button
-            android:id="@+id/createBtn"
+            android:id="@+id/leaveBtn"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:background="#FFFFFF"
-            android:onClick="createRoom"
+            android:onClick="leaveRoom"
             android:paddingBottom="8dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:paddingTop="10dp"
-            android:text="@string/create" />
-
+            android:text="@string/leave" />
     </LinearLayout>
     
     <ListView

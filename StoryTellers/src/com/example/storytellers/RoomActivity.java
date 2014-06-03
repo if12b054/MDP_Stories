@@ -51,13 +51,17 @@ public class RoomActivity extends Activity {
 		intent.putExtra("username", this.username);
 		RoomActivity.this.startActivity(intent);
 	}
-	
+
+	public final void showDetails(final View view) {
+		Intent intent = new Intent(RoomActivity.this,
+				RoomDetailsActivity.class);
+		intent.putExtra("username", this.username);
+		intent.putExtra("roomname", this.roomname);
+		RoomActivity.this.startActivity(intent);
+	}
+
 	@Override
 	public void onBackPressed() {
-	    Intent intent = new Intent(RoomActivity.this,
-				RoomListActivity.class);
-		intent.putExtra("username", this.username);
-		RoomActivity.this.startActivity(intent);
-	    finish();
+		// empty method to disable back button
 	}
 }

@@ -5,12 +5,15 @@
     <string name="welcome">Welcome fellow Storyteller!</string>
     <string name="hintUsername">Username</string>
     <string name="login">Login</string>
-    <string name="title_activity_room">Rooms</string>
+    <string name="title_activity_room">Room</string>
+    <string name="title_activity_roomlist">Rooms</string>
+    <string name="title_activity_roomdetails">Details</string>
     <string name="hintRoomname">Roomname</string>
     <string name="create">Create</string>
     <string name="hello_world">Hello world!</string>
     <string name="leave">Leave</string>
     <string name="send">Send</string>
     <string name="hintStory">Enter your sentence</string>
+    <string name="title_activity_room_details_activity_two">RoomDetailsActivityTwo</string>
 
 </resources>

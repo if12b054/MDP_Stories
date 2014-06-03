@@ -29,6 +29,6 @@ public class MainActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-
+		// empty method to disable back button
 	}
 }

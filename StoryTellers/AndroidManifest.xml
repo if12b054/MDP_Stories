@@ -24,12 +24,16 @@
         </activity>
         <activity
             android:name="com.example.storytellers.RoomListActivity"
-            android:label="@string/title_activity_room" >
+            android:label="@string/title_activity_roomlist" >
         </activity>
         <activity
             android:name="com.example.storytellers.RoomActivity"
-            android:label="@string/title_activity_room" 
+            android:label="@string/title_activity_room"
             android:windowSoftInputMode="adjustPan|adjustResize" >
+        </activity>
+        <activity
+            android:name="com.example.storytellers.RoomDetailsActivity"
+            android:label="@string/title_activity_roomdetails" >
         </activity>
     </application>
 
