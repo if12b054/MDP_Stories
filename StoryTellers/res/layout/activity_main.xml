@@ -24,12 +24,13 @@
         android:layout_below="@+id/welcomeView"
         android:layout_marginTop="55dp"
         android:hint="@string/hintUsername"
-        android:inputType="text"
         android:background="#FFFFFF"
         android:paddingBottom="8dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:paddingTop="8dp" />
+        android:paddingTop="8dp"
+        android:imeOptions="actionSend"
+        android:inputType="textCapSentences" />
 
     <Button
         android:id="@+id/loginBtn"
