@@ -37,7 +37,8 @@ public class RoomActivity extends Activity implements RoomRequestListener{
 			theClient = WarpClient.getInstance();
 			theClient.addRoomRequestListener(this);
 		} catch (Exception e) {
-			Log.d("WarpClient", "Something's wrong in onCreate() of RoomActivity");
+			Log.d("WarpClient", "Something's wrong in onCreate() "
+					+ "of RoomActivity");
 			e.printStackTrace();
 		}
 
@@ -46,9 +47,10 @@ public class RoomActivity extends Activity implements RoomRequestListener{
 
 		this.room = (TextView) findViewById(R.id.textRoomname);
 		this.room.setText(Utils.ACTUAL_ROOM_NAME);
-		
+
 		this.sentence = (EditText) findViewById(R.id.editStory);
-		this.sentence.setOnEditorActionListener(new OnEditorActionListener() {
+		this.sentence.setOnEditorActionListener(
+				new OnEditorActionListener() {
 		    @Override
 		    public boolean onEditorAction(TextView v, int actionId, 
 		    		KeyEvent event) {
@@ -62,6 +64,7 @@ public class RoomActivity extends Activity implements RoomRequestListener{
 		    }
 		});
 	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -70,7 +73,7 @@ public class RoomActivity extends Activity implements RoomRequestListener{
 
 	public final void sendSentence(final View view) {
 		int length = this.sentence.getText().length();
-		if ( length <= 0 ) {
+		if (length <= 0) {
 			this.sentence.setError("Please enter a sentence!");
 		} else {
 			this.story.append(this.sentence.getText().toString());
@@ -99,13 +102,11 @@ public class RoomActivity extends Activity implements RoomRequestListener{
 	@Override
 	public void onGetLiveRoomInfoDone(LiveRoomInfoEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onJoinRoomDone(RoomEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -113,54 +114,54 @@ public class RoomActivity extends Activity implements RoomRequestListener{
 		if(event.getResult()==WarpResponseResultCode.SUCCESS){
 			theClient.unsubscribeRoom(event.getData().getId());
 		}else{
-			showToastOnUIThread("onLeaveRoomDone with ErrorCode: "+event.getResult());
+			showToastOnUIThread("onLeaveRoomDone with ErrorCode: "
+					+ event.getResult());
 		}
 	}
 
 	@Override
 	public void onLockPropertiesDone(byte arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onSetCustomRoomDataDone(LiveRoomInfoEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onSubscribeRoomDone(RoomEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUnSubscribeRoomDone(RoomEvent event) {
 		if(event.getResult()==WarpResponseResultCode.SUCCESS){
-			Log.d("onUnSubscribeRoom", "Room \""+event.getData().getName()+"\" with id = "+event.getData().getId()+" is left!");
+			Log.d("onUnSubscribeRoom", "Room \"" + event.getData().getName()
+					+ "\" with id = " + event.getData().getId()
+					+ " is left!");
 			this.finish();
 		}else{
-			showToastOnUIThread("onUnSubscribeRoomDone with ErrorCode: "+event.getResult());
+			showToastOnUIThread("onUnSubscribeRoomDone with ErrorCode: "
+					+ event.getResult());
 		}
 	}
 
 	@Override
 	public void onUnlockPropertiesDone(byte arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUpdatePropertyDone(LiveRoomInfoEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
-	private void showToastOnUIThread(final String message){
+	private void showToastOnUIThread(final String message) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Toast.makeText(RoomActivity.this, message, Toast.LENGTH_LONG).show();
+				Toast.makeText(RoomActivity.this, message,
+						Toast.LENGTH_LONG).show();
 			}
 		});
 	}
