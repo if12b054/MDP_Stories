@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
@@ -35,6 +36,7 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 	private int maxUsers = 5;
 	private int turnTime = 30;
 	private WarpClient theClient;
+	private String[] roomIds;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -134,7 +136,7 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 	// get all rooms and put it into the list
 	@Override
 	public void onGetAllRoomsDone(AllRoomsEvent event) {
-		String[] roomIds = event.getRoomIds();
+		roomIds = event.getRoomIds();
 		this.rooms = new ArrayList<String>();
 		Log.d("Number of Rooms", Integer.toString(
 				event.getRoomIds().length));
@@ -199,9 +201,16 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 			            android.R.layout.simple_list_item_1,
 			            rooms);
 				setListAdapter(adapter);
+				
             }
 		});
 	}
+	
+	@Override  
+	protected void onListItemClick(ListView l, View v, int pos, long id) {  
+		Utils.ACTUAL_ROOM_ID = roomIds[pos];
+		theClient.joinRoom(Utils.ACTUAL_ROOM_ID);
+	}  
 
 	@Override
 	public void onLeaveRoomDone(RoomEvent arg0) {
