@@ -33,10 +33,11 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 	private EditText roomname;
 	private ArrayList<String> rooms;
 	private ArrayAdapter<String> adapter;
-	private int maxUsers = 5;
-	private int turnTime = 30;
+	private int maxUsers = 2;
+	private int turnTime = 10;
 	private WarpClient theClient;
 	private String[] roomIds;
+	private boolean creatingActivity = true;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -72,10 +73,11 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 
 	@Override
 	protected void onResume() {
-		super.onResume();
 		theClient.addRoomRequestListener(this);
 		rooms = null;
+		adapter = null;
 		createListView();
+		super.onResume();
 	}
 	@Override
 	protected void onPause() {
@@ -140,8 +142,11 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 		this.rooms = new ArrayList<String>();
 		Log.d("Number of Rooms", Integer.toString(
 				event.getRoomIds().length));
-		for (int i = 0; i < event.getRoomIds().length; i++) {
-			theClient.getLiveRoomInfo(roomIds[i]);
+		if(creatingActivity == true){
+			for (int i = 0; i < event.getRoomIds().length; i++) {
+				theClient.getLiveRoomInfo(roomIds[i]);
+			}
+			creatingActivity = false;
 		}
 	}
 	@Override
@@ -192,11 +197,11 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 	public void onGetLiveRoomInfoDone(LiveRoomInfoEvent event) {
 		this.rooms.add(event.getData().getName());
 		Log.d("Roomname : ", event.getData().getName());
-		// folgender adapter muss nach den folgemethoden aufgerufen
-		// werden nur wo? finde es heraus ;)
 		runOnUiThread(new Runnable() {
             @Override
             public void run() {
+            	Log.d("Listadapter", "neuer wird erstellt");
+            	Log.d("rooms",Integer.toString(rooms.size()));
             	adapter = new ArrayAdapter<String>(RoomListActivity.this,
 			            android.R.layout.simple_list_item_1,
 			            rooms);

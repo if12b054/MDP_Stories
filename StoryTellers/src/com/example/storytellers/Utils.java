@@ -12,6 +12,7 @@ public class Utils {
 	public static String USER_NAME = "";
 	public static String ACTUAL_ROOM_NAME = "";
 	public static String ACTUAL_ROOM_ID = "";
+	public static String ACTUAL_ROOM_OWNER = "";
 
 	public static String[] removeLocalUserNameFromArray(
 			final String[] user) {

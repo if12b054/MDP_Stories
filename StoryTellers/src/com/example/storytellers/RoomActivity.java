@@ -23,6 +23,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -33,11 +34,14 @@ import android.widget.TextView.OnEditorActionListener;
 
 public class RoomActivity extends Activity implements RoomRequestListener,TurnBasedRoomListener,NotifyListener{
 	
+	private Button sendBtn;
 	private TextView story;
 	private TextView room;
 	private EditText sentence;
 	private WarpClient theClient;
 	private int actualRoomUsers;
+	private boolean gameStarted = false;
+	private int moveCounter = 0;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -53,6 +57,8 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 					+ "of RoomActivity");
 			e.printStackTrace();
 		}
+		this.sendBtn = (Button) findViewById(R.id.sendBtn);
+		this.sendBtn.setEnabled(false);
 
 		this.story = (TextView) findViewById(R.id.textStory);
 		this.story.setMovementMethod(new ScrollingMovementMethod());
@@ -88,11 +94,11 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 		if (length <= 0) {
 			this.sentence.setError("Please enter a sentence!");
 		} else {
-			this.story.append(this.sentence.getText().toString());
-			this.sentence.setText("");
 			InputMethodManager imm = (InputMethodManager) getSystemService(
 				      Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(this.sentence.getWindowToken(), 0);
+			theClient.sendMove(this.sentence.getText().toString());
+			Log.d("sendSentence", "-----");
 		}
 	}
 
@@ -114,9 +120,20 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	@Override
 	public void onGetLiveRoomInfoDone(LiveRoomInfoEvent event) {
 		actualRoomUsers = event.getJoinedUsers().length;
-		if(actualRoomUsers == event.getData().getMaxUsers()){
+		Utils.ACTUAL_ROOM_OWNER = event.getData().getRoomOwner();
+		Log.d("onGetLiveRoomInfoDone", "-----");
+		if(actualRoomUsers == event.getData().getMaxUsers() && Utils.ACTUAL_ROOM_OWNER.equals(Utils.USER_NAME)&& gameStarted == false){
 			theClient.startGame();
+			gameStarted = true;
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					sendBtn.setEnabled(true);
+				}
+			});
+			Log.d("Game", "started");
 		}
+		
 	}
 
 	@Override
@@ -128,6 +145,7 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	public void onLeaveRoomDone(RoomEvent event) {
 		if(event.getResult()==WarpResponseResultCode.SUCCESS){
 			theClient.unsubscribeRoom(event.getData().getId());
+			Log.d("onLeaveRoomDone", "Room left");
 		}else{
 			showToastOnUIThread("onLeaveRoomDone with ErrorCode: "
 					+ event.getResult());
@@ -155,7 +173,29 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 			Log.d("onUnSubscribeRoom", "Room \"" + event.getData().getName()
 					+ "\" with id = " + event.getData().getId()
 					+ " is left!");
-			this.finish();
+			if(gameStarted == false){
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						sendBtn.setText("leave Room");
+						sendBtn.setEnabled(true);
+						sendBtn.setOnClickListener(new OnClickListener(){
+			
+							@Override
+							public void onClick(View v) {
+								Intent intent = new Intent(RoomActivity.this,
+										RoomListActivity.class);
+								RoomActivity.this.startActivity(intent);
+							}
+							   
+						});
+					}
+				});
+			}else{
+				Intent intent = new Intent(RoomActivity.this,
+						RoomListActivity.class);
+				RoomActivity.this.startActivity(intent);
+			}
 		}else{
 			showToastOnUIThread("onUnSubscribeRoomDone with ErrorCode: "
 					+ event.getResult());
@@ -189,20 +229,25 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 
 	@Override
 	public void onSendMoveDone(byte arg0) {
-		// TODO Auto-generated method stub
-		
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				sentence.setText("");
+				sendBtn.setEnabled(false);
+				Log.d("onSendMoveDone", "sendButton disabled");
+			}
+		});
 	}
 
 	@Override
 	public void onStartGameDone(byte arg0) {
-		// TODO Auto-generated method stub
+		gameStarted = true;
 		
 	}
 
 	@Override
 	public void onStopGameDone(byte arg0) {
-		// TODO Auto-generated method stub
-		
+		gameStarted = false;	
 	}
 
 	@Override
@@ -219,14 +264,34 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 
 	@Override
 	public void onGameStopped(String arg0, String arg1) {
-		// TODO Auto-generated method stub
-		
+		theClient.leaveRoom(Utils.ACTUAL_ROOM_ID);
 	}
 
 	@Override
-	public void onMoveCompleted(MoveEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void onMoveCompleted(final MoveEvent event) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				story.append(event.getMoveData());
+			}
+		});
+		Log.d("onMoveCompleted", "");
+		if(event.getNextTurn().equals(Utils.USER_NAME)){
+			if(Utils.ACTUAL_ROOM_OWNER.equals(Utils.USER_NAME)){
+				moveCounter++;
+				if(moveCounter == 5){
+					theClient.stopGame();
+					Log.d("Game", "stopped");
+				}
+			}
+			Log.d("onMoveCompleted", "Your next turn!");
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					sendBtn.setEnabled(true);
+				}
+			});
+		}
 	}
 
 	@Override
@@ -268,9 +333,8 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 
 	@Override
 	public void onUserJoinedRoom(RoomData roomData, String roomId) {
-		
-		roomData.getMaxUsers();
 		theClient.getLiveRoomInfo(roomData.getId());
+		Log.d("onUserJoinedRoom", "");
 	}
 
 	@Override
