@@ -214,6 +214,7 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 	@Override  
 	protected void onListItemClick(ListView l, View v, int pos, long id) {  
 		Utils.ACTUAL_ROOM_ID = roomIds[pos];
+		Utils.ACTUAL_ROOM_NAME = rooms.get(pos);
 		theClient.joinRoom(Utils.ACTUAL_ROOM_ID);
 	}  
 

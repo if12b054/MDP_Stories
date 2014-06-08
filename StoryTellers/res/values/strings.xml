@@ -15,5 +15,6 @@
     <string name="send">Send</string>
     <string name="hintStory">Enter your sentence</string>
     <string name="title_activity_room_details_activity_two">RoomDetailsActivityTwo</string>
+    <string name="info">info</string>
 
 </resources>
