@@ -28,7 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
-public class RoomListActivity extends ListActivity implements ZoneRequestListener,RoomRequestListener{
+public class RoomListActivity extends ListActivity implements ZoneRequestListener,
+RoomRequestListener {
 
 	private EditText roomname;
 	private ArrayList<String> rooms;
@@ -49,6 +50,10 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 			Log.d("WarpClient", "Something's wrong in onCreate() "
 					+ "of RoomListActivity");
 			e.printStackTrace();
+			Intent intent = new Intent(RoomListActivity.this,
+					MainActivity.class);
+			RoomListActivity.this.startActivity(intent);
+			finish();
 		}
 		// zuerst checken ob man noch eingeloggt ist
 		// wenn nicht zurück zum einloggen!
@@ -103,7 +108,8 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 
 	@Override
 	public void onBackPressed() {
-	    Intent intent = new Intent(RoomListActivity.this,
+	    theClient.disconnect();
+		Intent intent = new Intent(RoomListActivity.this,
 				MainActivity.class);
 		RoomListActivity.this.startActivity(intent);
 	    finish();
@@ -149,6 +155,7 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 			creatingActivity = false;
 		}
 	}
+	
 	@Override
 	public void onJoinRoomDone(RoomEvent event) {
 		if (event.getResult() == WarpResponseResultCode.SUCCESS) {
@@ -159,6 +166,7 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
 					+ event.getResult());
 		}
 	}
+	
 	@Override
 	public void onSubscribeRoomDone(RoomEvent event) {
 		if (event.getResult() == WarpResponseResultCode.SUCCESS) {
@@ -205,8 +213,7 @@ public class RoomListActivity extends ListActivity implements ZoneRequestListene
             	adapter = new ArrayAdapter<String>(RoomListActivity.this,
 			            android.R.layout.simple_list_item_1,
 			            rooms);
-				setListAdapter(adapter);
-				
+				setListAdapter(adapter);			
             }
 		});
 	}

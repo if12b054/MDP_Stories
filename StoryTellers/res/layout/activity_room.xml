@@ -31,19 +31,6 @@
 			android:clickable="true" />
 
         <Button
-            android:id="@+id/infoBtn"
-            android:layout_width="80dp"
-            android:layout_height="33dp"
-            android:layout_marginRight="10dp"
-            android:background="#FFFFFF"
-            android:onClick="showDetails"
-            android:paddingBottom="8dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingTop="10dp"
-            android:text="@string/info" />
-
-        <Button
             android:id="@+id/leaveBtn"
             android:layout_width="80dp"
             android:layout_height="wrap_content"

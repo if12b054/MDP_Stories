@@ -23,7 +23,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -103,7 +102,12 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	}
 
 	public final void leaveRoom(final View view) {
+		theClient.unsubscribeRoom(Utils.ACTUAL_ROOM_ID);
 		theClient.leaveRoom(Utils.ACTUAL_ROOM_ID);
+		Intent intent = new Intent(RoomActivity.this,
+				RoomListActivity.class);
+		RoomActivity.this.startActivity(intent);
+		finish();
 	}
 
 	public final void showDetails(final View view) {
@@ -132,8 +136,7 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 				}
 			});
 			Log.d("Game", "started");
-		}
-		
+		}		
 	}
 
 	@Override
@@ -143,7 +146,7 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 
 	@Override
 	public void onLeaveRoomDone(RoomEvent event) {
-		if(event.getResult()==WarpResponseResultCode.SUCCESS){
+		if( event.getResult() == WarpResponseResultCode.SUCCESS) {
 			theClient.unsubscribeRoom(event.getData().getId());
 			Log.d("onLeaveRoomDone", "Room left");
 		}else{
@@ -169,34 +172,10 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 
 	@Override
 	public void onUnSubscribeRoomDone(RoomEvent event) {
-		if(event.getResult()==WarpResponseResultCode.SUCCESS){
-			Log.d("onUnSubscribeRoom", "Room \"" + event.getData().getName()
-					+ "\" with id = " + event.getData().getId()
-					+ " is left!");
-			if(gameStarted == false){
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						sendBtn.setText("leave Room");
-						sendBtn.setEnabled(true);
-						sendBtn.setOnClickListener(new OnClickListener(){
-			
-							@Override
-							public void onClick(View v) {
-								Intent intent = new Intent(RoomActivity.this,
-										RoomListActivity.class);
-								RoomActivity.this.startActivity(intent);
-							}
-							   
-						});
-					}
-				});
-			}else{
-				Intent intent = new Intent(RoomActivity.this,
-						RoomListActivity.class);
-				RoomActivity.this.startActivity(intent);
-			}
-		}else{
+		if(event.getResult() == WarpResponseResultCode.SUCCESS){
+			Log.d("onUnSubscribeRoom", "Unsubscribed Room \"" + event.getData().getName()
+					+ "\" with id = " + event.getData().getId());
+		} else {
 			showToastOnUIThread("onUnSubscribeRoomDone with ErrorCode: "
 					+ event.getResult());
 		}
@@ -224,7 +203,6 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	@Override
 	public void onGetMoveHistoryDone(byte arg0, MoveEvent[] arg1) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
