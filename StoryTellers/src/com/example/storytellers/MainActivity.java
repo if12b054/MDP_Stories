@@ -63,6 +63,14 @@ public class MainActivity extends Activity implements ConnectionRequestListener 
 		super.onStop();
 		theClient.removeConnectionRequestListener(this);
 	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		if(theClient!=null){
+			theClient.removeConnectionRequestListener(this);
+		}
+	}
 
 	@Override
 	public void onBackPressed() {

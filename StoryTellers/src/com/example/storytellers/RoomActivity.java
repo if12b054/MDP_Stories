@@ -64,6 +64,7 @@ TurnBasedRoomListener, NotifyListener{
 			RoomActivity.this.startActivity(intent);
 			finish();
 		}
+		
 		this.sendBtn = (Button) findViewById(R.id.sendBtn);
 		this.sendBtn.setEnabled(false);
 
@@ -93,13 +94,27 @@ TurnBasedRoomListener, NotifyListener{
 	@Override
 	protected void onResume() {
 		super.onResume();
-		theClient.addRoomRequestListener(this);		
+		theClient.addRoomRequestListener(this);
+		theClient.addTurnBasedRoomListener(this);
+		theClient.addNotificationListener(this);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 		theClient.removeRoomRequestListener(this);
+		theClient.removeTurnBasedRoomListener(this);
+		theClient.removeNotificationListener(this);
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		if(theClient!=null){
+			theClient.removeRoomRequestListener(this);
+			theClient.removeTurnBasedRoomListener(this);
+			theClient.removeNotificationListener(this);
+		}
 	}
 
 	public final void sendSentence(final View view) {
@@ -156,7 +171,6 @@ TurnBasedRoomListener, NotifyListener{
 	@Override
 	public void onLeaveRoomDone(RoomEvent event) {
 		if( event.getResult() == WarpResponseResultCode.SUCCESS) {
-			theClient.unsubscribeRoom(event.getData().getId());
 			Log.d("onLeaveRoomDone", "Room left");
 			Intent intent = new Intent(RoomActivity.this,
 					RoomListActivity.class);
@@ -245,7 +259,6 @@ TurnBasedRoomListener, NotifyListener{
 	@Override
 	public void onChatReceived(ChatEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

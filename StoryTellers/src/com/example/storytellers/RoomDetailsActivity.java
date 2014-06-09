@@ -58,6 +58,14 @@ public class RoomDetailsActivity extends ListActivity implements RoomRequestList
 		super.onPause();
 		theClient.removeRoomRequestListener(this);
 	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		if(theClient!=null){
+			theClient.removeRoomRequestListener(this);
+		}
+	}
 
 	private void createListView() {
 		theClient.getLiveRoomInfo(Utils.ACTUAL_ROOM_ID);
@@ -96,7 +104,6 @@ public class RoomDetailsActivity extends ListActivity implements RoomRequestList
 	@Override
 	public void onLeaveRoomDone(RoomEvent event) {
 		if( event.getResult() == WarpResponseResultCode.SUCCESS) {
-			theClient.unsubscribeRoom(event.getData().getId());
 			Log.d("onLeaveRoomDone", "Room left");
 			Intent intent = new Intent(RoomDetailsActivity.this,
 					RoomListActivity.class);

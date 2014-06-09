@@ -48,6 +48,8 @@ RoomRequestListener {
 		setContentView(R.layout.activity_roomlist);
 		try {
 			theClient = WarpClient.getInstance();
+			theClient.addRoomRequestListener(this);
+			theClient.addZoneRequestListener(this);
 		} catch (Exception e) {
 			Log.d("WarpClient", "Something's wrong in onCreate() "
 					+ "of RoomListActivity");
@@ -84,6 +86,7 @@ RoomRequestListener {
 	protected void onResume() {
 		super.onResume();
 		theClient.addRoomRequestListener(this);
+		theClient.addZoneRequestListener(this);
 		createListView();
 	}
 	
@@ -91,6 +94,16 @@ RoomRequestListener {
 	protected void onPause() {
 		super.onPause();
 		theClient.removeRoomRequestListener(this);
+		theClient.removeZoneRequestListener(this);
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		if(theClient!=null){
+			theClient.removeRoomRequestListener(this);
+			theClient.removeZoneRequestListener(this);
+		}
 	}
 
 	private void createListView() {
