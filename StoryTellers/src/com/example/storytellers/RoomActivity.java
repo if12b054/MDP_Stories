@@ -23,6 +23,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -31,7 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
-public class RoomActivity extends Activity implements RoomRequestListener,TurnBasedRoomListener,NotifyListener{
+public class RoomActivity extends Activity implements RoomRequestListener,
+TurnBasedRoomListener, NotifyListener{
 	
 	private Button sendBtn;
 	private TextView story;
@@ -45,6 +47,8 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//Remove title bar
+	    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_room);
 		try {
 			theClient = WarpClient.getInstance();
@@ -55,6 +59,10 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 			Log.d("WarpClient", "Something's wrong in onCreate() "
 					+ "of RoomActivity");
 			e.printStackTrace();
+			Intent intent = new Intent(RoomActivity.this,
+					MainActivity.class);
+			RoomActivity.this.startActivity(intent);
+			finish();
 		}
 		this.sendBtn = (Button) findViewById(R.id.sendBtn);
 		this.sendBtn.setEnabled(false);
@@ -83,6 +91,12 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		theClient.addRoomRequestListener(this);		
+	}
+
+	@Override
 	protected void onPause() {
 		super.onPause();
 		theClient.removeRoomRequestListener(this);
@@ -103,11 +117,6 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 
 	public final void leaveRoom(final View view) {
 		theClient.unsubscribeRoom(Utils.ACTUAL_ROOM_ID);
-		theClient.leaveRoom(Utils.ACTUAL_ROOM_ID);
-		Intent intent = new Intent(RoomActivity.this,
-				RoomListActivity.class);
-		RoomActivity.this.startActivity(intent);
-		finish();
 	}
 
 	public final void showDetails(final View view) {
@@ -149,6 +158,10 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 		if( event.getResult() == WarpResponseResultCode.SUCCESS) {
 			theClient.unsubscribeRoom(event.getData().getId());
 			Log.d("onLeaveRoomDone", "Room left");
+			Intent intent = new Intent(RoomActivity.this,
+					RoomListActivity.class);
+			RoomActivity.this.startActivity(intent);
+			finish();
 		}else{
 			showToastOnUIThread("onLeaveRoomDone with ErrorCode: "
 					+ event.getResult());
@@ -175,6 +188,7 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 		if(event.getResult() == WarpResponseResultCode.SUCCESS){
 			Log.d("onUnSubscribeRoom", "Unsubscribed Room \"" + event.getData().getName()
 					+ "\" with id = " + event.getData().getId());
+			theClient.leaveRoom(Utils.ACTUAL_ROOM_ID);
 		} else {
 			showToastOnUIThread("onUnSubscribeRoomDone with ErrorCode: "
 					+ event.getResult());
@@ -190,6 +204,7 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	public void onUpdatePropertyDone(LiveRoomInfoEvent arg0) {
 		// TODO Auto-generated method stub
 	}
+	
 	private void showToastOnUIThread(final String message) {
 		runOnUiThread(new Runnable() {
 			@Override
