@@ -220,7 +220,6 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 	@Override
 	public void onStartGameDone(byte arg0) {
 		gameStarted = true;
-		
 	}
 
 	@Override
@@ -236,12 +235,14 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 
 	@Override
 	public void onGameStarted(String arg0, String arg1, String arg2) {
-		// TODO Auto-generated method stub
-		
+		showToastOnUIThread("Game start");
+		gameStarted = true;
+		showToastOnUIThread("Your turn");
 	}
 
 	@Override
 	public void onGameStopped(String arg0, String arg1) {
+		showToastOnUIThread("Game over");
 		theClient.leaveRoom(Utils.ACTUAL_ROOM_ID);
 	}
 
@@ -259,10 +260,14 @@ public class RoomActivity extends Activity implements RoomRequestListener,TurnBa
 				moveCounter++;
 				if(moveCounter == 5){
 					theClient.stopGame();
+					gameStarted = false;
 					Log.d("Game", "stopped");
 				}
 			}
+			if(gameStarted == true){
 			Log.d("onMoveCompleted", "Your next turn!");
+			showToastOnUIThread("Your turn");
+			}
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
