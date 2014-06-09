@@ -33,8 +33,8 @@ import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
 public class RoomActivity extends Activity implements RoomRequestListener,
-TurnBasedRoomListener, NotifyListener{
-	
+TurnBasedRoomListener, NotifyListener {
+
 	private Button sendBtn;
 	private TextView story;
 	private TextView room;
@@ -52,9 +52,6 @@ TurnBasedRoomListener, NotifyListener{
 		setContentView(R.layout.activity_room);
 		try {
 			theClient = WarpClient.getInstance();
-			theClient.addRoomRequestListener(this);
-			theClient.addTurnBasedRoomListener(this);
-			theClient.addNotificationListener(this);
 		} catch (Exception e) {
 			Log.d("WarpClient", "Something's wrong in onCreate() "
 					+ "of RoomActivity");
@@ -64,7 +61,7 @@ TurnBasedRoomListener, NotifyListener{
 			RoomActivity.this.startActivity(intent);
 			finish();
 		}
-		
+
 		this.sendBtn = (Button) findViewById(R.id.sendBtn);
 		this.sendBtn.setEnabled(false);
 
@@ -92,6 +89,14 @@ TurnBasedRoomListener, NotifyListener{
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		theClient.addRoomRequestListener(this);
+		theClient.addTurnBasedRoomListener(this);
+		theClient.addNotificationListener(this);
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 		theClient.addRoomRequestListener(this);
@@ -106,15 +111,20 @@ TurnBasedRoomListener, NotifyListener{
 		theClient.removeTurnBasedRoomListener(this);
 		theClient.removeNotificationListener(this);
 	}
-	
+
 	@Override
-	public void onDestroy(){
+	public void onDestroy() {
 		super.onDestroy();
-		if(theClient!=null){
+		if (theClient != null) {
 			theClient.removeRoomRequestListener(this);
 			theClient.removeTurnBasedRoomListener(this);
 			theClient.removeNotificationListener(this);
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		// empty method to disable back button
 	}
 
 	public final void sendSentence(final View view) {
@@ -140,85 +150,6 @@ TurnBasedRoomListener, NotifyListener{
 		RoomActivity.this.startActivity(intent);
 	}
 
-	@Override
-	public void onBackPressed() {
-		// empty method to disable back button
-	}
-
-	@Override
-	public void onGetLiveRoomInfoDone(LiveRoomInfoEvent event) {
-		actualRoomUsers = event.getJoinedUsers().length;
-		Utils.ACTUAL_ROOM_OWNER = event.getData().getRoomOwner();
-		Log.d("onGetLiveRoomInfoDone", "-----");
-		if(actualRoomUsers == event.getData().getMaxUsers() && Utils.ACTUAL_ROOM_OWNER.equals(Utils.USER_NAME)&& gameStarted == false){
-			theClient.startGame();
-			gameStarted = true;
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					sendBtn.setEnabled(true);
-				}
-			});
-			Log.d("Game", "started");
-		}		
-	}
-
-	@Override
-	public void onJoinRoomDone(RoomEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onLeaveRoomDone(RoomEvent event) {
-		if( event.getResult() == WarpResponseResultCode.SUCCESS) {
-			Log.d("onLeaveRoomDone", "Room left");
-			Intent intent = new Intent(RoomActivity.this,
-					RoomListActivity.class);
-			RoomActivity.this.startActivity(intent);
-			finish();
-		}else{
-			showToastOnUIThread("onLeaveRoomDone with ErrorCode: "
-					+ event.getResult());
-		}
-	}
-
-	@Override
-	public void onLockPropertiesDone(byte arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onSetCustomRoomDataDone(LiveRoomInfoEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onSubscribeRoomDone(RoomEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onUnSubscribeRoomDone(RoomEvent event) {
-		if(event.getResult() == WarpResponseResultCode.SUCCESS){
-			Log.d("onUnSubscribeRoom", "Unsubscribed Room \"" + event.getData().getName()
-					+ "\" with id = " + event.getData().getId());
-			theClient.leaveRoom(Utils.ACTUAL_ROOM_ID);
-		} else {
-			showToastOnUIThread("onUnSubscribeRoomDone with ErrorCode: "
-					+ event.getResult());
-		}
-	}
-
-	@Override
-	public void onUnlockPropertiesDone(byte arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onUpdatePropertyDone(LiveRoomInfoEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-	
 	private void showToastOnUIThread(final String message) {
 		runOnUiThread(new Runnable() {
 			@Override
@@ -230,8 +161,56 @@ TurnBasedRoomListener, NotifyListener{
 	}
 
 	@Override
-	public void onGetMoveHistoryDone(byte arg0, MoveEvent[] arg1) {
-		// TODO Auto-generated method stub
+	public void onUserJoinedRoom(RoomData roomData, String roomId) {
+		theClient.getLiveRoomInfo(roomData.getId());
+		Log.d("onUserJoinedRoom", "");
+	}
+
+	@Override
+	public void onGetLiveRoomInfoDone(LiveRoomInfoEvent event) {
+		actualRoomUsers = event.getJoinedUsers().length;
+		Utils.ACTUAL_ROOM_OWNER = event.getData().getRoomOwner();
+		Log.d("onGetLiveRoomInfoDone", "-----");
+		if (actualRoomUsers == event.getData().getMaxUsers()
+				&& Utils.ACTUAL_ROOM_OWNER.equals(Utils.USER_NAME)
+				&& gameStarted == false) {
+			theClient.startGame();
+			gameStarted = true;
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					sendBtn.setEnabled(true);
+				}
+			});
+			Log.d("Game", "started");
+		}
+	}
+
+	@Override
+	public void onUnSubscribeRoomDone(RoomEvent event) {
+		if (event.getResult() == WarpResponseResultCode.SUCCESS) {
+			Log.d("onUnSubscribeRoom", "Unsubscribed Room \""
+					+ event.getData().getName()
+					+ "\" with id = " + event.getData().getId());
+			theClient.leaveRoom(Utils.ACTUAL_ROOM_ID);
+		} else {
+			showToastOnUIThread("onUnSubscribeRoomDone with ErrorCode: "
+					+ event.getResult());
+		}
+	}
+
+	@Override
+	public void onLeaveRoomDone(RoomEvent event) {
+		if (event.getResult() == WarpResponseResultCode.SUCCESS) {
+			Log.d("onLeaveRoomDone", "Room left");
+			Intent intent = new Intent(RoomActivity.this,
+					RoomListActivity.class);
+			RoomActivity.this.startActivity(intent);
+			finish();
+		} else {
+			showToastOnUIThread("onLeaveRoomDone with ErrorCode: "
+					+ event.getResult());
+		}
 	}
 
 	@Override
@@ -244,21 +223,6 @@ TurnBasedRoomListener, NotifyListener{
 				Log.d("onSendMoveDone", "sendButton disabled");
 			}
 		});
-	}
-
-	@Override
-	public void onStartGameDone(byte arg0) {
-		gameStarted = true;
-	}
-
-	@Override
-	public void onStopGameDone(byte arg0) {
-		gameStarted = false;	
-	}
-
-	@Override
-	public void onChatReceived(ChatEvent arg0) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -283,18 +247,18 @@ TurnBasedRoomListener, NotifyListener{
 			}
 		});
 		Log.d("onMoveCompleted", "");
-		if(event.getNextTurn().equals(Utils.USER_NAME)){
-			if(Utils.ACTUAL_ROOM_OWNER.equals(Utils.USER_NAME)){
+		if (event.getNextTurn().equals(Utils.USER_NAME)) {
+			if (Utils.ACTUAL_ROOM_OWNER.equals(Utils.USER_NAME)) {
 				moveCounter++;
-				if(moveCounter == 5){
+				if (moveCounter == 5) {
 					theClient.stopGame();
 					gameStarted = false;
 					Log.d("Game", "stopped");
 				}
 			}
-			if(gameStarted == true){
-			Log.d("onMoveCompleted", "Your next turn!");
-			showToastOnUIThread("Your turn");
+			if (gameStarted == true) {
+				Log.d("onMoveCompleted", "Your next turn!");
+				showToastOnUIThread("Your turn");
 			}
 			runOnUiThread(new Runnable() {
 				@Override
@@ -306,69 +270,103 @@ TurnBasedRoomListener, NotifyListener{
 	}
 
 	@Override
+	public void onStartGameDone(byte arg0) {
+		gameStarted = true;
+	}
+
+	@Override
+	public void onStopGameDone(byte arg0) {
+		gameStarted = false;
+	}
+
+	@Override
+	public void onJoinRoomDone(RoomEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onLockPropertiesDone(byte arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onSetCustomRoomDataDone(LiveRoomInfoEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onSubscribeRoomDone(RoomEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onUnlockPropertiesDone(byte arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onUpdatePropertyDone(LiveRoomInfoEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onGetMoveHistoryDone(byte arg0, MoveEvent[] arg1) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onChatReceived(ChatEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
 	public void onPrivateChatReceived(String arg0, String arg1) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onRoomCreated(RoomData arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onRoomDestroyed(RoomData arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUpdatePeersReceived(UpdateEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUserChangeRoomProperty(RoomData arg0, String arg1,
 			HashMap<String, Object> arg2, HashMap<String, String> arg3) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUserJoinedLobby(LobbyData arg0, String arg1) {
 		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onUserJoinedRoom(RoomData roomData, String roomId) {
-		theClient.getLiveRoomInfo(roomData.getId());
-		Log.d("onUserJoinedRoom", "");
 	}
 
 	@Override
 	public void onUserLeftLobby(LobbyData arg0, String arg1) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUserLeftRoom(RoomData arg0, String arg1) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUserPaused(String arg0, boolean arg1, String arg2) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onUserResumed(String arg0, boolean arg1, String arg2) {
 		// TODO Auto-generated method stub
-		
 	}
 }

@@ -29,8 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
-public class RoomListActivity extends ListActivity implements ZoneRequestListener,
-RoomRequestListener {
+public class RoomListActivity extends ListActivity implements
+ZoneRequestListener, RoomRequestListener {
 
 	private EditText roomname;
 	private ArrayList<String> rooms;
@@ -48,8 +48,6 @@ RoomRequestListener {
 		setContentView(R.layout.activity_roomlist);
 		try {
 			theClient = WarpClient.getInstance();
-			theClient.addRoomRequestListener(this);
-			theClient.addZoneRequestListener(this);
 		} catch (Exception e) {
 			Log.d("WarpClient", "Something's wrong in onCreate() "
 					+ "of RoomListActivity");
@@ -59,11 +57,6 @@ RoomRequestListener {
 			RoomListActivity.this.startActivity(intent);
 			finish();
 		}
-		// zuerst checken ob man noch eingeloggt ist
-		// wenn nicht zurück zum einloggen!
-		this.adapter = null;
-		theClient.addZoneRequestListener(this);
-		theClient.addRoomRequestListener(this);
 		this.rooms = new ArrayList<String>();
 		this.roomname = (EditText) findViewById(R.id.editRoomname);
 		this.roomname.setOnEditorActionListener(
@@ -83,32 +76,43 @@ RoomRequestListener {
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		theClient.addRoomRequestListener(this);
+		theClient.addZoneRequestListener(this);
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 		theClient.addRoomRequestListener(this);
 		theClient.addZoneRequestListener(this);
 		createListView();
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 		theClient.removeRoomRequestListener(this);
 		theClient.removeZoneRequestListener(this);
 	}
-	
+
 	@Override
-	public void onDestroy(){
+	public void onDestroy() {
 		super.onDestroy();
-		if(theClient!=null){
+		if (theClient != null) {
 			theClient.removeRoomRequestListener(this);
 			theClient.removeZoneRequestListener(this);
 		}
 	}
 
-	private void createListView() {
-		theClient.getAllRooms();
-		System.out.println("create list called");
+	@Override
+	public void onBackPressed() {
+	    theClient.disconnect();
+		Intent intent = new Intent(RoomListActivity.this,
+				MainActivity.class);
+		RoomListActivity.this.startActivity(intent);
+	    finish();
 	}
 
 	public final void createRoom(final View view) {
@@ -123,13 +127,9 @@ RoomRequestListener {
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-	    theClient.disconnect();
-		Intent intent = new Intent(RoomListActivity.this,
-				MainActivity.class);
-		RoomListActivity.this.startActivity(intent);
-	    finish();
+	private void createListView() {
+		theClient.getAllRooms();
+		System.out.println("create list called");
 	}
 
 	private void showToastOnUIThread(final String message) {
@@ -154,12 +154,6 @@ RoomRequestListener {
 	}
 
 	@Override
-	public void onDeleteRoomDone(RoomEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	// get all rooms and put it into the list
-	@Override
 	public void onGetAllRoomsDone(AllRoomsEvent event) {
 		roomIds = event.getRoomIds();
 		Log.d("Number of Rooms", Integer.toString(
@@ -170,26 +164,45 @@ RoomRequestListener {
 			}
 		}
 	}
-	
+
+	@Override
+	public void onGetLiveRoomInfoDone(LiveRoomInfoEvent event) {
+		this.rooms.add(event.getData().getName());
+		Log.d("Roomname : ", event.getData().getName());
+		if (this.rooms.size() == this.roomIds.length){
+			runOnUiThread(new Runnable() {
+	            @Override
+	            public void run() {
+	            	Log.d("Listadapter", "neuer wird erstellt");
+	            	Log.d("rooms",Integer.toString(rooms.size()));
+	            	adapter = null;
+	            	adapter = new ArrayAdapter<String>(RoomListActivity.this,
+				            R.layout.list_item, rooms);
+					setListAdapter(adapter);
+	            }
+			});
+		}
+	}
+
 	@Override  
-	protected void onListItemClick(ListView l, View v, int pos, long id) {  
+	protected void onListItemClick(ListView l, View v, int pos, long id) {
 		this.adapter.notifyDataSetChanged();
 		Utils.ACTUAL_ROOM_ID = roomIds[pos];
 		Utils.ACTUAL_ROOM_NAME = rooms.get(pos);
 		theClient.joinRoom(Utils.ACTUAL_ROOM_ID);
 	}
-	
+
 	@Override
 	public void onJoinRoomDone(RoomEvent event) {
 		if (event.getResult() == WarpResponseResultCode.SUCCESS) {
 			Utils.ACTUAL_ROOM_ID = event.getData().getId();
 			theClient.subscribeRoom(event.getData().getId());
-		} else{
+		} else {
 			showToastOnUIThread("onJoinRoomDone with ErrorCode: "
 					+ event.getResult());
 		}
 	}
-	
+
 	@Override
 	public void onSubscribeRoomDone(RoomEvent event) {
 		if (event.getResult() == WarpResponseResultCode.SUCCESS) {
@@ -203,6 +216,11 @@ RoomRequestListener {
 			showToastOnUIThread("onSubscribeRoomDone Failed with ErrorCode: "
 					+ event.getResult());
 		}
+	}
+
+	@Override
+	public void onDeleteRoomDone(RoomEvent arg0) {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -223,25 +241,6 @@ RoomRequestListener {
 	@Override
 	public void onSetCustomUserDataDone(LiveUserInfoEvent arg0) {
 		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onGetLiveRoomInfoDone(LiveRoomInfoEvent event) {
-		this.rooms.add(event.getData().getName());
-		Log.d("Roomname : ", event.getData().getName());
-		if (this.rooms.size() == this.roomIds.length){ 
-			runOnUiThread(new Runnable() {
-	            @Override
-	            public void run() {
-	            	Log.d("Listadapter", "neuer wird erstellt");
-	            	Log.d("rooms",Integer.toString(rooms.size()));
-	            	adapter = null;
-	            	adapter = new ArrayAdapter<String>(RoomListActivity.this,
-				            R.layout.list_item, rooms);
-					setListAdapter(adapter);
-	            }
-			});
-		}
 	}
 
 	@Override

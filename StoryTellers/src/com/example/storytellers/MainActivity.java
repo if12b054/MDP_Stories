@@ -21,7 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
-public class MainActivity extends Activity implements ConnectionRequestListener {
+public class MainActivity extends Activity implements
+ConnectionRequestListener {
 
 	private EditText username;
 	private WarpClient theClient;
@@ -38,7 +39,7 @@ public class MainActivity extends Activity implements ConnectionRequestListener 
 		this.username.setOnEditorActionListener(
 				new OnEditorActionListener() {
 		    @Override
-		    public boolean onEditorAction(TextView v, int actionId, 
+		    public boolean onEditorAction(TextView v, int actionId,
 		    		KeyEvent event) {
 		        boolean handled = false;
 		        if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -63,21 +64,24 @@ public class MainActivity extends Activity implements ConnectionRequestListener 
 		super.onStop();
 		theClient.removeConnectionRequestListener(this);
 	}
-	
+
 	@Override
-	public void onDestroy(){
+	public void onDestroy() {
 		super.onDestroy();
-		if(theClient!=null){
+		if (theClient != null) {
 			theClient.removeConnectionRequestListener(this);
 		}
 	}
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
 		if (theClient != null) {
 			theClient.disconnect();
 		}
+		Intent intent = new Intent(MainActivity.this,
+				MainActivity.class);
+		MainActivity.this.startActivity(intent);
+		finish();
 	}
 
 	public final void login(final View view) {
@@ -103,6 +107,16 @@ public class MainActivity extends Activity implements ConnectionRequestListener 
             Toast.makeText(this, "Exception in Initilization",
             		Toast.LENGTH_LONG).show();
         }
+	}
+
+	private void showToastOnUIThread(final String message){
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast.makeText(MainActivity.this, message,
+						Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 
 	@Override
@@ -151,21 +165,10 @@ public class MainActivity extends Activity implements ConnectionRequestListener 
 	@Override
 	public void onDisconnectDone(ConnectEvent arg0) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void onInitUDPDone(byte arg0) {
 		// TODO Auto-generated method stub
-
-	}
-	private void showToastOnUIThread(final String message){
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast.makeText(MainActivity.this, message,
-						Toast.LENGTH_LONG).show();
-			}
-		});
 	}
 }
