@@ -226,7 +226,6 @@ RoomRequestListener {
 	            	adapter = new ArrayAdapter<String>(RoomListActivity.this,
 				            R.layout.list_item, rooms);
 					setListAdapter(adapter);
-					adapter.notifyDataSetChanged();
 	            }
 			});
 		}
